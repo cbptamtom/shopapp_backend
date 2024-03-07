@@ -84,16 +84,26 @@ CREATE TABLE orders(
     total_money FLOAT CHECK(total_money >= 0)
 );
 
+ALTER TABLE orders ADD COLUMN `shipping_method` VARCHAR(100);
+ALTER TABLE orders ADD COLUMN `shipping_address` VARCHAR(200);
+ALTER TABLE orders ADD COLUMN `shipping_date` DATE;
+ALTER TABLE orders ADD COLUMN `tracking_number` VARCHAR(200);
+ALTER TABLE orders ADD COLUMN `payment_method` VARCHAR(200);
+-- xóa 1 đơn hàng => xóa mềm => thêm trường active
+ALTER TABLE orders ADD COLUMN active TINYINT(1);
+-- Trạng thái đơn hàng chỉ được phép nhận một số giá trị cụ thể
+ALTER TABLE orders
+MODIFY COLUMN status ENUM('pending','processing','shipped','delivered','cancelled')
+COMMENT'Trạng thái đơn hàng';
+
 CREATE TABLE order_details(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    fullname VARCHAR(100),
-    email VARCHAR(100),
-    phone_nunmber VARCHAR(20) NOT NULL,
-    address VARCHAR(200) NOT NULL,
-    note VARCHAR(100) DEFAULT '',
-    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20),
-    total_money FLOAT CHECK(total_money >= 0)
-);
+    order_id INT,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    product_id INT,
+    FOREIGN KEY (product_id) REFERENCES prodects(id),
+    price FLOAT CHECK (price >= 0),
+    number_of_products INT CHECK(number_of_products > 0),
+    total_money FLOAT CHECK(total_money >= 0),
+    color VARCHAR(20) DEFAULT ''
+);  
